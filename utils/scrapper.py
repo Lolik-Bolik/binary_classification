@@ -15,7 +15,7 @@ class Scrapper:
 
     @staticmethod
     def fetch_image_urls(query: str, max_links_to_fetch: int,
-                         wd: webdriver, sleep_between_interactions: int = 1):
+                         wd: webdriver, sleep_between_interactions: float = 0.5):
 
         def scroll_to_end(wd):
             wd.execute_script("window.scrollTo(0, document.body.scrollHeight);")
@@ -89,22 +89,23 @@ class Scrapper:
         except Exception as e:
             print(f"ERROR - Could not save {url} - {e}")
 
-    def search_and_download(self, search_term: str, driver_path: str, target_path='./images_2', number_images=2):
+    def search_and_download(self, search_term: str, driver_path: str, target_path, number_images):
         target_folder = os.path.join(target_path,'_'.join(search_term.lower().split(' ')))
 
         if not os.path.exists(target_folder):
             os.makedirs(target_folder)
 
         with webdriver.Chrome(executable_path=driver_path) as wd:
-            res = self.fetch_image_urls(search_term, number_images, wd=wd, sleep_between_interactions=0.5)
+            res = self.fetch_image_urls(search_term, number_images, wd=wd)
 
         for elem in res:
             self.persist_image(target_folder, elem)
 
-    def __call__(self, sample_number_per_class=2):
+    def __call__(self, target_path, sample_number_per_class=2):
         assert self.driver_path is not None
         file = open(self.input_file, 'r')
         classes = file.readlines()
         for object in classes:
             self.search_and_download(search_term=object, driver_path=self.driver_path,
+                                     target_path=target_path,
                                      number_images=sample_number_per_class)
