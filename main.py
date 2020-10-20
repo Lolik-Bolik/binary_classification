@@ -1,5 +1,13 @@
-from utils import Scrapper
+from utils import Scrapper, Config
 
 
-scrapper = Scrapper('classes.txt', '/home/alexander/Documents/chromedriver')
-scrapper(50)
+def main(opts):
+    # download samples from google
+    if opts.download_data:
+        scrapper = Scrapper(opts.file_with_classes, opts.path_to_driver)
+        scrapper(opts.samples_per_class)
+
+
+if __name__ == "__main__":
+    args = Config(path_to_data='.images/')
+    main(args)
