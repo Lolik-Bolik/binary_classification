@@ -8,4 +8,5 @@ For the scrapper(utils/scrapper.py) you should install webdriver
 - install appropriate driver [here](https://sites.google.com/a/chromium.org/chromedriver/downloads)
 
 Install python requirements
-<pip install -r requirements.txt>
+
+``` pip install -r requirements.txt ```
