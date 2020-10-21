@@ -1,33 +1,94 @@
-from utils import Scrapper, Config, load_split_train_test, crop_face
-import numpy as np
+from utils import Scrapper, ScrapperConfig, TrainConfig, load_split_train_test, crop_face
 import torch
+import wandb
 from torch import nn
 from torch import optim
-import torch.nn.functional as F
-from torchvision import datasets, transforms, models
-from torch.utils.data.sampler import SubsetRandomSampler
-from facenet_pytorch import MTCNN, InceptionResnetV1
-import cv2
+from torchvision import models
+import os
 
-def main(opts):
+wandb.init(project="Keira_Natalie_classification")
+
+
+def train(args, model, device, criterion, train_loader, optimizer, scheduler, epoch):
+    scheduler.step()
+    model.train()
+    train_loss = 0
+    correct = 0
+    for batch_idx, (data, target) in enumerate(train_loader):
+        data, target = data.to(device, dtype=torch.float), target.to(device)
+        optimizer.zero_grad()
+        output = model(data)
+        loss = criterion(output, target)
+        train_loss += loss
+        # get the index of the max log-probability
+        pred = output.max(1, keepdim=True)[1]
+        correct += pred.eq(target.view_as(pred)).sum().item()
+        loss.backward()
+        optimizer.step()
+        if batch_idx % args.log_interval == 0:
+            print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
+                epoch, batch_idx * len(data), len(train_loader.dataset),
+                100. * batch_idx / len(train_loader), loss.item()))
+    wandb.log({
+        "Train Accuracy": 100. * correct / len(train_loader.dataset),
+        "Train Loss": train_loss})
+
+
+def test(model, criterion,  device, test_loader):
+    model.eval()
+    test_loss = 0
+    correct = 0
+
+    example_images = []
+    with torch.no_grad():
+        for data, target in test_loader:
+            data, target = data.to(device, dtype=torch.float), target.to(device)
+            output = model(data)
+            # sum up batch loss
+            test_loss += criterion(output, target)
+            # get the index of the max log-probability
+            pred = output.max(1, keepdim=True)[1]
+            correct += pred.eq(target.view_as(pred)).sum().item()
+            example_images.append(wandb.Image(
+                data[0], caption="Pred: {} Truth: {}".format(pred[0].item(), target[0])))
+    accuracy = 100. * correct / len(test_loader.dataset)
+    wandb.log({
+        "Examples": example_images,
+        "Test Accuracy": accuracy,
+        "Test Loss": test_loss})
+    return accuracy
+
+
+def main(scrapper_opts, train_opts):
+    wandb.config.update(train_opts)
     # download samples from google
-    if opts.download_data:
-        scrapper = Scrapper(opts.file_with_classes, opts.path_to_driver)
-        scrapper(opts.target_path, opts.samples_per_class)
-        crop_face(opts.path_to_data, 'faces')
+    if scrapper_opts.download_data:
+        scrapper = Scrapper(scrapper_opts.file_with_classes, scrapper_opts.path_to_driver)
+        scrapper(scrapper_opts.target_path, scrapper_opts.samples_per_class)
+        crop_face(scrapper_opts.path_to_data, 'faces')
 
-    # simple resnet50
-    if opts.path_to_data:
-        trainloader, testloader = load_split_train_test(opts.path_to_data, .2)
+    # as the baseline, we will use squeezenet lightweight classification model
+    if scrapper_opts.path_to_data:
+        trainloader, testloader = load_split_train_test(train_opts, scrapper_opts.path_to_data, .2)
         device = torch.device("cuda" if torch.cuda.is_available()
                               else "cpu")
-        model = models.resnet50(pretrained=True)
+        model = models.resnet18(pretrained=True)
+        num_features = model.fc.in_features
+        model.fc = nn.Linear(num_features, 2)
+        criterion = nn.CrossEntropyLoss()
+        optimizer_ft = optim.Adam(model.parameters(), lr=0.001)
+        exp_lr_scheduler = optim.lr_scheduler.StepLR(optimizer_ft, step_size=7, gamma=0.1)
         model.to(device)
-
-
-
+        wandb.watch(model)
+        min_accuracy = 0
+        for epoch in range(1, train_opts.epochs + 1):
+            train(train_opts, model, device, criterion, trainloader, optimizer_ft, exp_lr_scheduler, epoch)
+            test_accuracy = test(model, criterion, device, testloader)
+            if test_accuracy > min_accuracy:
+                torch.save(model.state_dict(), os.path.join(wandb.run.dir, "best_model.pth"))
 
 
 if __name__ == "__main__":
-    args = Config(path_to_data='images')
-    main(args)
+    scrapper_args = ScrapperConfig(path_to_data='faces')
+    train_args = TrainConfig()
+    main(scrapper_args, train_args)

@@ -1,20 +1,50 @@
 import numpy as np
 import torch
-from torchvision import datasets, transforms, models
+from torchvision import datasets, transforms
 from torch.utils.data.sampler import SubsetRandomSampler
+import albumentations as A
+from torch.utils.data import Dataset
+import cv2
+from albumentations.pytorch import ToTensorV2
+np.random.seed(42)
 
 
-def load_split_train_test(datadir, valid_size=.2):
-    train_transforms = transforms.Compose([transforms.Resize(224),
-                                           transforms.ToTensor(),
-                                           ])
-    test_transforms = transforms.Compose([transforms.Resize(224),
-                                          transforms.ToTensor(),
-                                          ])
-    train_data = datasets.ImageFolder(datadir,
-                                      transform=train_transforms)
-    test_data = datasets.ImageFolder(datadir,
-                                     transform=test_transforms)
+class AlbumentationsDataset(datasets.ImageFolder):
+
+    def __init__(self, root, transform=None):
+        super(AlbumentationsDataset, self).__init__(root, transform)
+
+    def __getitem__(self, idx):
+        path, target = self.samples[idx]
+        # sample = self.loader(path)
+        image = cv2.imread(path)
+        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        if self.transform is not None:
+            image = self.transform(image=image)
+            image = image['image']
+        return image, target
+
+    def __len__(self):
+        return len(self.samples)
+
+
+def load_split_train_test(train_opts, datadir, valid_size=.2):
+    train_transforms = A.Compose([
+        A.Resize(224, 224),
+        A.ImageCompression(quality_lower=50, p=0.3),
+        A.GaussianBlur(p=0.5),
+        A.GaussNoise(p=0.5),
+        ToTensorV2()
+
+    ])
+    test_transforms = A.Compose([
+        A.Resize(224, 224),
+        ToTensorV2()
+    ])
+
+    train_data = AlbumentationsDataset(datadir, transform=train_transforms)
+    test_data = AlbumentationsDataset(datadir, transform=test_transforms)
+
     num_train = len(train_data)
     indices = list(range(num_train))
     split = int(np.floor(valid_size * num_train))
@@ -23,7 +53,7 @@ def load_split_train_test(datadir, valid_size=.2):
     train_sampler = SubsetRandomSampler(train_idx)
     test_sampler = SubsetRandomSampler(test_idx)
     trainloader = torch.utils.data.DataLoader(train_data,
-                                              sampler=train_sampler, batch_size=8)
+                                              sampler=train_sampler, batch_size=train_opts.train_batch_size)
     testloader = torch.utils.data.DataLoader(test_data,
-                                             sampler=test_sampler, batch_size=4)
+                                             sampler=test_sampler, batch_size=train_opts.test_batch_size)
     return trainloader, testloader
