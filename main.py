@@ -6,6 +6,10 @@ from torch import nn
 from models.model_builder import build_model
 from trainer import Trainer
 from losses import LabelSmoothingLoss
+import numpy as np
+
+torch.manual_seed(42)
+np.random.seed(42)
 
 
 wandb.init(project="Keira_Natalie_classification")
@@ -21,7 +25,7 @@ def main(scrapper_opts, train_opts):
 
     # as the baseline, we will use squeezenet lightweight classification model
     if scrapper_opts.path_to_data:
-        model = build_model('dummy_model')
+        model = build_model(train_opts.model_name)
         criterion = LabelSmoothingLoss(2) if train_args.criterion == 'labelsmoothing' else nn.CrossEntropyLoss()
         optimizer_ft = optim.Adam(model.parameters(), lr=0.0001)
         trainer = Trainer(train_args, model, criterion, optimizer_ft, wandb)

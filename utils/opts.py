@@ -11,11 +11,12 @@ class ScrapperConfig:
 
 class TrainConfig:
     def __init__(self):
+        self.model_name = 'dummy_model'
         self.log_interval = 2
         self.train_batch_size = 32
         self.test_batch_size = 16
         self.num_workers = 4
         self.epochs = 100
         self.datapath = 'faces'
-        self.criterion = 'labelsmoothing'
+        self.criterion = 'labelsmoothing'  #'labelsmoothing'
 
