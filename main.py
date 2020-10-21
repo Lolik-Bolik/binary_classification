@@ -22,7 +22,7 @@ def accuracy(output, target, topk=(1,)):
     res = []
     for k in topk:
         correct_k = correct[:k].view(-1).float().sum(0)
-        res.append(correct_k.mul_(100.0 / batch_size))
+        res.append(correct_k.mul_(1.0 / batch_size))
     return res
 
 
@@ -46,7 +46,7 @@ def train(args, model, device, criterion, train_loader, optimizer, scheduler, ep
                 epoch, batch_idx * len(data), len(train_loader.dataset),
                 100. * batch_idx / len(train_loader), loss.item()))
     wandb.log({
-        "Train Accuracy": total_accuracy / len(train_loader.dataset),
+        "Train Accuracy": total_accuracy / len(train_loader),
         "Train Loss": train_loss})
 
 
@@ -95,7 +95,7 @@ def main(scrapper_opts, train_opts):
         # num_features = model.fc.in_features
         # model.fc = nn.Linear(num_features, 2)
         criterion = nn.CrossEntropyLoss()
-        optimizer_ft = optim.Adam(model.parameters(), lr=0.00001)
+        optimizer_ft = optim.Adam(model.parameters(), lr=0.0001)
         # exp_lr_scheduler = optim.lr_scheduler.StepLR(optimizer_ft, step_size=7, gamma=0.1)
         model.to(device)
         wandb.watch(model)
