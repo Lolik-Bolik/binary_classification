@@ -11,9 +11,9 @@ class ScrapperConfig:
 
 class TrainConfig:
     def __init__(self):
-        self.log_interval = 10
+        self.log_interval = 2
         self.train_batch_size = 32
         self.test_batch_size = 16
-        self.epochs = 50
         self.num_workers = 4
+        self.epochs = 100
 

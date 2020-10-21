@@ -1,10 +1,10 @@
 from utils import Scrapper, ScrapperConfig, TrainConfig, load_split_train_test, crop_face
 import torch
 import wandb
-from torch import nn
 from torch import optim
-from torchvision import models
 import os
+from torch import nn
+from models.model_builder import build_model
 
 
 wandb.init(project="Keira_Natalie_classification")
@@ -22,7 +22,7 @@ def accuracy(output, target, topk=(1,)):
     res = []
     for k in topk:
         correct_k = correct[:k].view(-1).float().sum(0)
-        res.append(correct_k.mul_(1.0 / batch_size))
+        res.append(correct_k.mul_(1. / batch_size))
     return res
 
 
@@ -42,9 +42,8 @@ def train(args, model, device, criterion, train_loader, optimizer, scheduler, ep
         loss.backward()
         optimizer.step()
         if batch_idx % args.log_interval == 0:
-            print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
-                epoch, batch_idx * len(data), len(train_loader.dataset),
-                100. * batch_idx / len(train_loader), loss.item()))
+            print(f'Train Epoch: {epoch} [{batch_idx * len(data)}/{len(train_loader.dataset)}] '
+                  f'\tLoss: {round(loss.item(),3)}')
     wandb.log({
         "Train Accuracy": total_accuracy / len(train_loader),
         "Train Loss": train_loss})
@@ -86,14 +85,7 @@ def main(scrapper_opts, train_opts):
         trainloader, testloader = load_split_train_test(train_opts, scrapper_opts.path_to_data, .2)
         device = torch.device("cuda" if torch.cuda.is_available()
                               else "cpu")
-        model = models.squeezenet1_1(pretrained=True)
-        num_of_output_classes = 2
-        # change the last conv2d layer
-        model.classifier._modules["1"] = nn.Conv2d(512, num_of_output_classes, kernel_size=(1, 1))
-        # change the internal num_classes variable rather than redefining the forward pass
-        model.num_classes = num_of_output_classes
-        # num_features = model.fc.in_features
-        # model.fc = nn.Linear(num_features, 2)
+        model = build_model('dummy_model')
         criterion = nn.CrossEntropyLoss()
         optimizer_ft = optim.Adam(model.parameters(), lr=0.0001)
         # exp_lr_scheduler = optim.lr_scheduler.StepLR(optimizer_ft, step_size=7, gamma=0.1)
@@ -108,6 +100,6 @@ def main(scrapper_opts, train_opts):
 
 
 if __name__ == "__main__":
-    scrapper_args = ScrapperConfig(path_to_data='training_set/training_set')
+    scrapper_args = ScrapperConfig(path_to_data='faces')
     train_args = TrainConfig()
     main(scrapper_args, train_args)

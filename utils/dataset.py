@@ -30,14 +30,20 @@ class AlbumentationsDataset(datasets.ImageFolder):
 def load_split_train_test(train_opts, datadir, valid_size=.2):
     train_transforms = A.Compose([
         A.Resize(227, 227),
-        # A.GaussianBlur(p=0.5),
-        # A.GaussNoise(p=0.5),
-        ToTensorV2()
+        A.ColorJitter(p=0.5),
+        A.OneOf([
+            A.GaussianBlur(p=1),
+            A.GaussNoise(p=1),
+        ], p=0.8),
+        A.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+        ToTensorV2(),
 
     ])
     test_transforms = A.Compose([
         A.Resize(227, 227),
-        ToTensorV2()
+        A.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+        ToTensorV2(),
+
     ])
 
     train_data = AlbumentationsDataset(datadir, transform=train_transforms)
