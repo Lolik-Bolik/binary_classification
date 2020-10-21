@@ -52,10 +52,10 @@ def run(opts):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Classify input image')
-    parser.add_argument('--input_image', type=str, help='path to input image')
-    parser.add_argument('--model_path', type=str, help='path to model')
+    parser.add_argument('--input_image', type=str, help='path to input image', default='./test_images/portman_star_wars.jpg')
+    parser.add_argument('--model_path', type=str, help='path to model', default='best_model.pth')
     parser.add_argument('--model_name', type=str, help='model name'
-                                                       'could be "squeezenet" or "dummy_model"')
+                                                       'could be "squeezenet" or "dummy_model"', default='dummy_model')
     parser.add_argument('--face_threshold', type=str, default=0.7, help='threshold')
     parser.add_argument('--fps_count', action='store_true')
     args = parser.parse_args()
