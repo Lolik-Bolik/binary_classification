@@ -17,4 +17,5 @@ class TrainConfig:
         self.num_workers = 4
         self.epochs = 100
         self.datapath = 'faces'
+        self.criterion = 'labelsmoothing'
 
