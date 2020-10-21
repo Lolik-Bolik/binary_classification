@@ -97,10 +97,10 @@ face_cropped = mtcnn(img, save_path=<optional save path>)
 В результате тренировки мы получили следующие результаты:
 
 
-|Name                    |Runtime|datapath|epochs|test_batch_size|train_batch_size|criterion   |model_name |Test Accuracy|Test Loss          |Train Accuracy    |Train Loss         |
-|------------------------|-------|--------|------|---------------|----------------|------------|-----------|-------------|-------------------|------------------|-------------------|
-|our_model_crossentropy|118    |faces   |100   |16             |32              |crossentropy|dummy_model|0.8125       |0.798 |0.963|0.124  |
-|squeezenet_crossentropy |64     |faces   |100   |16             |32              |crossentropy|squeezenet |0.9375       |0.368|1                 |0.0012|
+|Name                    |Runtime|datapath|epochs|test_batch_size|train_batch_size|criterion   |Test Accuracy|Test Loss          |Train Accuracy    |Train Loss         |
+|------------------------|-------|--------|------|---------------|----------------|------------|-------------|-------------------|------------------|-------------------|
+|our_model_crossentropy|118    |faces   |100   |16             |32              |crossentropy|0.8125       |0.798 |0.963|0.124  |
+|squeezenet_crossentropy |64     |faces   |100   |16             |32              |crossentropy|0.9375       |0.368|1                 |0.0012|
 
 
 
