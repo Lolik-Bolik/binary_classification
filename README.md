@@ -69,6 +69,27 @@ face_cropped = mtcnn(img, save_path=<optional save path>)
 
 #### Аугментация данных
 
+Для предотвращения переобучения и расширения тренировочной выборки мы решили использовать некоторые аугментации из библиотеки [albementations](https://github.com/albumentations-team/albumentations)
+
+- GaussNoise
+- GaussBlur
+- ColorJitter
+
+Которые с некоторой вероятностью добавляют на тренировочные изображения шум, размытие и контрастность.
+
+### Выбор модели
+
+Сначала мы выбрали готовую классификационную модель из зоопарка моделей [torchvision](https://pytorch.org/docs/stable/torchvision/models.html) 
+
+|Model  | Params size (MB) | 
+|---|---|
+| SqueezeNet  |  4.71 |
+| ResNet  |  44.59 |
+| AlexNet  |  233.08 |
+| **Our**  |  70.00 |
+
+
+
 
 
 
