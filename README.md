@@ -1,15 +1,32 @@
-## Binary classification
-## We will distinguish Keira Knightley from Natalie Portman
+## Бинарная Классификация изображений
 
-## Visualisation
+### Введение и постановка проблемы
+В мире существует большое количество отличных актрис и так уж вышло, что некоторые из них очень похожи друг на друга.
 
-[weights&biases training info](https://wandb.ai/alexslav1999/Keira_Natalie_classification?workspace=user-alexslav1999)
-### Installation
+Но современные технологии позволяют решать подобного рода проблемы, в данной работе с помошью сверточных нейронных сетей мы будем различать между собой **Натали Портман** и **Киру Найтли**.
 
-For the scrapper(utils/scrapper.py) you should install webdriver
-- check the chrome version [instruction](https://www.businessinsider.com/what-version-of-google-chrome-do-i-have)
-- install appropriate driver [here](https://sites.google.com/a/chromium.org/chromedriver/downloads)
+Может возникуть резонный вопрос, а кому это вообще надо?
 
-Install python requirements
+У нас есть  ответ - это нужно как минимум самой Кире Найтли: 
 
-``` pip install -r requirements.txt ```
+[Подтверждение](https://youtu.be/_X3yoBbDEtc?t=5)
+
+
+Более того, весьма интересный факт. Карьера Киры Найтли пошла в гору после того, как она сыграла двойника Натали Портман в фильме "Звездные Войны"
+
+![](https://v1.popcornnews.ru/k2/news/970/upload/news/711840213099.jpg)
+
+В гриме Киру Найтли и Натали Портман не могли отличить даже родные матери. Что ж, посмотрим, сможет ли это сделать бездушный AI.
+
+### Сбор данных
+Для начала соберем данные.
+Лазить по интернету руками и собирать нужные картинки - не интересно, скучно и долго.
+
+![](https://miro.medium.com/max/700/1*hWOlRny3IiFDLutlMkn16Q.jpeg)
+
+Поэтому мы написали [scrapper](utils/scrapper.py#L11) - скрипт, который автоматически собирает из интернета нужные вам данные, вам остается лишь указать, что именно вы хотите найти.
+
+Тут необходимо сделать сноску относительно законности этого шага. Необходимо понимать, что фотографии находятся под разными лицензиями, поэтому использовать их в коммерчиских целях нужно с крайней осторожностью. Мы этого не делаем )
+
+После работы данного скрипта мы получаем нужные нам [данные](images)
+
