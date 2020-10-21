@@ -9,12 +9,12 @@ class BasicBlock(nn.Module):
         self.conv1 = nn.Conv2d(in_channels, out_channels, kernel_size=3, stride=stride, padding=pad, bias=False)
         self.batch_norm = nn.BatchNorm2d(out_channels)
         self.leaky_relu = nn.LeakyReLU(inplace=True)
-        self.average_pooling = nn.AvgPool2d(kernel_size=2, stride=2, padding=0)
+        self.max_pooling = nn.MaxPool2d(kernel_size=2, stride=2, padding=0)
 
     def forward(self, x):
         out = self.conv1(x)
         out = self.batch_norm(out)
-        out = self.average_pooling(out)
+        out = self.max_pooling(out)
         out = self.leaky_relu(out)
         return out
 
