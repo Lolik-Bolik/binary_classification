@@ -1,9 +1,10 @@
 ## Binary classification
 ## We will distinguish Keira Knightley from Natalie Portman
 
-## Visualisation
+### Visualisation
 
 [weights&biases training info](https://wandb.ai/alexslav1999/Keira_Natalie_classification?workspace=user-alexslav1999)
+
 ### Installation
 
 For the scrapper(utils/scrapper.py) you should install webdriver
