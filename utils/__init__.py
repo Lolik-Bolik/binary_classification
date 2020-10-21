@@ -5,3 +5,4 @@ from .cropping_faces import crop_face
 from .metrics import accuracy
 from .logger import Logger
 from .average_meter import AverageMeter
+from .visualize import draw_classification_legend

@@ -7,4 +7,4 @@ numpy==1.19.2
 facenet-pytorch==2.5.0
 tqdm==4.50.2
 wandb==0.10.7
-opencv-python==4.4.0.44
+opencv-python==4.0.1.23

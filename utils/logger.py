@@ -10,7 +10,7 @@ class Logger:
               f'\tLoss: {round(loss, 3)}')
 
     def epoch_log(self, accuracy, loss, stage, **kwargs):
-        data = {"Train Accuracy": accuracy[stage].avg,
-            "Train Loss": loss[stage].avg}
+        data = {f"{stage} Accuracy": accuracy[stage].avg,
+            f"{stage} Loss": loss[stage].avg}
         data.update(kwargs)
         self.wandb.log(data)

@@ -2,25 +2,13 @@ import argparse
 from models.model_builder import build_model
 from utils import crop_face
 import torch
-import numpy as np
 import cv2
 import logging as logger
-import albumentations as A
-from albumentations.pytorch import ToTensorV2
 logger.basicConfig(level=logger.INFO)
+import os
+from utils import draw_classification_legend
 
-test_transforms = A.Compose([
-    A.Resize(227, 227),
-    A.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
-    ToTensorV2(),
-
-])
-
-classes = \
-    {
-        0: 'Keira Knightley',
-        1: 'Natalie Portman'
-    }
+classes = ['Keira Knightley', 'Natalie Portman']
 
 
 def run(opts):
@@ -32,18 +20,19 @@ def run(opts):
     logger.info('Model was successfully built and loaded !')
     logger.info('Read input image ...')
     input_image = cv2.imread(opts.input_image)
+    image_name = os.path.basename(opts.input_image)
+    print(image_name)
     input_image = cv2.cvtColor(input_image, cv2.COLOR_BGR2RGB)
     face, prob = crop_face(img=input_image)
     if prob >= opts.face_threshold:
-        augmented_face = test_transforms(image=np.array(face))
-        input_tensor = augmented_face['image']
-        input_tensor = input_tensor.to(device, dtype=torch.float).squeeze(0)
+        input_tensor = face.to(device, dtype=torch.float).unsqueeze(0)
         output = model(input_tensor)
-        pred = output.max(1, keepdim=True)[1]
-        print(pred)
-
-
-
+        results = {cls: round(score.item(), 3) for cls, score in zip(classes, output.softmax(dim=1).squeeze(0))}
+        image = draw_classification_legend(image=input_image, class_map=results)
+        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        cv2.imwrite(f'results/{image_name}', image)
+        cv2.imshow('result', image)
+        cv2.waitKey(0)
 
 
 if __name__ == '__main__':
@@ -53,7 +42,5 @@ if __name__ == '__main__':
     parser.add_argument('--model_name', type=str, help='model name'
                                                        'could be "squeezenet" or "dummy_model"')
     parser.add_argument('--face_threshold', type=str,default=0.7, help='threshold')
-
-
     args = parser.parse_args()
     run(args)

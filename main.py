@@ -20,15 +20,12 @@ def main(scrapper_opts, train_opts):
 
     # as the baseline, we will use squeezenet lightweight classification model
     if scrapper_opts.path_to_data:
-        model = build_model('dummy_model')
+        model = build_model('squeezenet')
         criterion = nn.CrossEntropyLoss()
         optimizer_ft = optim.Adam(model.parameters(), lr=0.0001)
-        # exp_lr_scheduler = optim.lr_scheduler.StepLR(optimizer_ft, step_size=7, gamma=0.1)
         trainer = Trainer(train_args, model, criterion, optimizer_ft, wandb)
         wandb.watch(model)
         trainer.run_training()
-
-
 
 
 if __name__ == "__main__":

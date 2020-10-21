@@ -25,6 +25,6 @@ def crop_face(datadir=None, path_to_save=None, img=None):
                     save_path = os.path.join(path_to_save, class_type, file)
                     mtcnn(image, save_path=save_path)
     else:
-        mtcnn = MTCNN(image_size=224, device=device)
+        mtcnn = MTCNN(image_size=227, device=device)
         face, prob = mtcnn(img, return_prob=True)
         return face, prob
