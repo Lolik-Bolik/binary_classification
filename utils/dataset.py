@@ -16,7 +16,6 @@ class AlbumentationsDataset(datasets.ImageFolder):
 
     def __getitem__(self, idx):
         path, target = self.samples[idx]
-        # sample = self.loader(path)
         image = cv2.imread(path)
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         if self.transform is not None:
@@ -30,15 +29,14 @@ class AlbumentationsDataset(datasets.ImageFolder):
 
 def load_split_train_test(train_opts, datadir, valid_size=.2):
     train_transforms = A.Compose([
-        A.Resize(224, 224),
-        A.ImageCompression(quality_lower=50, p=0.3),
-        A.GaussianBlur(p=0.5),
-        A.GaussNoise(p=0.5),
+        A.Resize(227, 227),
+        # A.GaussianBlur(p=0.5),
+        # A.GaussNoise(p=0.5),
         ToTensorV2()
 
     ])
     test_transforms = A.Compose([
-        A.Resize(224, 224),
+        A.Resize(227, 227),
         ToTensorV2()
     ])
 

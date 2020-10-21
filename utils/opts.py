@@ -14,5 +14,5 @@ class TrainConfig:
         self.log_interval = 10
         self.train_batch_size = 8
         self.test_batch_size = 4
-        self.epochs = 10
+        self.epochs = 50
 
