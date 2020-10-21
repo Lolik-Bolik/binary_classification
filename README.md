@@ -48,6 +48,28 @@
 
 ### Предобработка данных
 
+Так как по сути мы решаем задачу, очень похожую на задачу face recognition, мы будем подавать на вход сети не просто картинку с актрисой, а область с лицом, вырезанную с этого изображения. 
+![](https://cloud.githubusercontent.com/assets/896692/23625227/42c65360-025d-11e7-94ea-b12f28cb34b4.png)
+
+Делать мы это будем с помощью предтреннированной сети [facenet](https://github.com/timesler/facenet-pytorch). 
+
+```python
+from facenet_pytorch import MTCNN
+
+mtcnn = MTCNN(image_size=<image_size>, margin=<margin>)
+
+face_cropped = mtcnn(img, save_path=<optional save path>)
+
+```
+[Код в проекте](https://github.com/Lolik-Bolik/binary_classification/blob/main/utils/cropping_faces.py#L9)
+
+В результате чего, мы получаем видоизменненые данные, где все изображение актрис заменены на их лица.
+
+[Полученные данные](faces)
+
+#### Аугментация данных
+
+
 
 
 
