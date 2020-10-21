@@ -27,7 +27,8 @@ class AlbumentationsDataset(datasets.ImageFolder):
         return len(self.samples)
 
 
-def load_split_train_test(train_opts, datadir, valid_size=.2):
+def load_split_train_test(train_opts, valid_size=.2):
+    datadir = train_opts.datapath
     train_transforms = A.Compose([
         A.Resize(227, 227),
         A.ColorJitter(p=0.5),

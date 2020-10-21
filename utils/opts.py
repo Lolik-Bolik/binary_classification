@@ -16,4 +16,5 @@ class TrainConfig:
         self.test_batch_size = 16
         self.num_workers = 4
         self.epochs = 100
+        self.datapath = 'faces'
 
