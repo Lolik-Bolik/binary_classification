@@ -7,15 +7,23 @@ from models.model_builder import build_model
 from trainer import Trainer
 from losses import LabelSmoothingLoss
 import numpy as np
+import random
 
-torch.manual_seed(42)
-np.random.seed(42)
+
+def set_seed():
+    torch.manual_seed(42)
+    torch.cuda.manual_seed_all(42)
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
+    random.seed(42)
+    np.random.seed(42)
 
 
 wandb.init(project="Keira_Natalie_classification")
 
 
 def main(scrapper_opts, train_opts):
+    set_seed()
     wandb.config.update(train_opts)
     # download samples from google
     if scrapper_opts.download_data:
