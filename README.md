@@ -83,12 +83,25 @@ face_cropped = mtcnn(img, save_path=<optional save path>)
 
 Сначала мы выбрали готовую классификационную модель из зоопарка моделей [torchvision](https://pytorch.org/docs/stable/torchvision/models.html) 
 
+Мы выбрали самую легковесную модель - SqueezNet, так как наш датасет получился достаточно небольшого размера (100 примеров на класс).
+Так же забегая вперед, мы добавили в таблицу нашу кастомную получишвшуюся модель, которая вышла намного тяжелее. 
+
 |Model  | Params size (MB) | 
 |---|---|
 | SqueezeNet  |  4.71 |
 | ResNet  |  44.59 |
 | AlexNet  |  233.08 |
 | **Our**  |  70.00 |
+
+
+В результате тренировки мы получили следующие результаты:
+
+
+|Name                    |Runtime|datapath|epochs|test_batch_size|train_batch_size|criterion   |model_name |Test Accuracy|Test Loss          |Train Accuracy    |Train Loss         |
+|------------------------|-------|--------|------|---------------|----------------|------------|-----------|-------------|-------------------|------------------|-------------------|
+|our_model_crossentropy|118    |faces   |100   |16             |32              |crossentropy|dummy_model|0.8125       |0.798 |0.963|0.124  |
+|squeezenet_crossentropy |64     |faces   |100   |16             |32              |crossentropy|squeezenet |0.9375       |0.368|1                 |0.0012|
+
 
 
 
