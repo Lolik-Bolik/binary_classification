@@ -10,21 +10,35 @@ import os
 wandb.init(project="Keira_Natalie_classification")
 
 
+def accuracy(output, target, topk=(1,)):
+    """Computes the precision@k for the specified values of k"""
+    maxk = max(topk)
+    batch_size = target.size(0)
+
+    _, pred = output.topk(maxk, 1, True, True)
+    pred = pred.t()
+    correct = pred.eq(target.view(1, -1).expand_as(pred))
+
+    res = []
+    for k in topk:
+        correct_k = correct[:k].view(-1).float().sum(0)
+        res.append(correct_k.mul_(100.0 / batch_size))
+    return res
+
+
 def train(args, model, device, criterion, train_loader, optimizer, scheduler, epoch):
     if scheduler is not None:
         scheduler.step()
     model.train()
     train_loss = 0
-    correct = 0
+    total_accuracy = 0
     for batch_idx, (data, target) in enumerate(train_loader):
         data, target = data.to(device, dtype=torch.float), target.to(device)
         optimizer.zero_grad()
         output = model(data)
         loss = criterion(output, target)
         train_loss += loss
-        # get the index of the max log-probability
-        pred = output.max(1, keepdim=True)[1]
-        correct += pred.eq(target.view_as(pred)).sum().item()
+        total_accuracy += accuracy(output, target)[0]
         loss.backward()
         optimizer.step()
         if batch_idx % args.log_interval == 0:
@@ -32,15 +46,14 @@ def train(args, model, device, criterion, train_loader, optimizer, scheduler, ep
                 epoch, batch_idx * len(data), len(train_loader.dataset),
                 100. * batch_idx / len(train_loader), loss.item()))
     wandb.log({
-        "Train Accuracy": 100. * correct / len(train_loader.dataset),
+        "Train Accuracy": total_accuracy / len(train_loader.dataset),
         "Train Loss": train_loss})
 
 
 def test(model, criterion,  device, test_loader):
     model.eval()
     test_loss = 0
-    correct = 0
-
+    total_accuracy = 0
     example_images = []
     with torch.no_grad():
         for data, target in test_loader:
@@ -48,17 +61,16 @@ def test(model, criterion,  device, test_loader):
             output = model(data)
             # sum up batch loss
             test_loss += criterion(output, target)
+            total_accuracy += accuracy(output, target)[0]
             # get the index of the max log-probability
             pred = output.max(1, keepdim=True)[1]
-            correct += pred.eq(target.view_as(pred)).sum().item()
             example_images.append(wandb.Image(
                 data[0], caption="Pred: {} Truth: {}".format(pred[0].item(), target[0])))
-    accuracy = 100. * correct / len(test_loader.dataset)
     wandb.log({
         "Examples": example_images,
-        "Test Accuracy": accuracy,
+        "Test Accuracy": total_accuracy / len(test_loader),
         "Test Loss": test_loss})
-    return accuracy
+    return total_accuracy / len(test_loader)
 
 
 def main(scrapper_opts, train_opts):
@@ -96,6 +108,6 @@ def main(scrapper_opts, train_opts):
 
 
 if __name__ == "__main__":
-    scrapper_args = ScrapperConfig(path_to_data='faces')
+    scrapper_args = ScrapperConfig(path_to_data='data')
     train_args = TrainConfig()
     main(scrapper_args, train_args)
