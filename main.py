@@ -95,7 +95,7 @@ def main(scrapper_opts, train_opts):
         # num_features = model.fc.in_features
         # model.fc = nn.Linear(num_features, 2)
         criterion = nn.CrossEntropyLoss()
-        optimizer_ft = optim.Adam(model.parameters(), lr=0.0001)
+        optimizer_ft = optim.Adam(model.parameters(), lr=0.00001)
         # exp_lr_scheduler = optim.lr_scheduler.StepLR(optimizer_ft, step_size=7, gamma=0.1)
         model.to(device)
         wandb.watch(model)
@@ -108,6 +108,6 @@ def main(scrapper_opts, train_opts):
 
 
 if __name__ == "__main__":
-    scrapper_args = ScrapperConfig(path_to_data='data')
+    scrapper_args = ScrapperConfig(path_to_data='training_set/training_set')
     train_args = TrainConfig()
     main(scrapper_args, train_args)

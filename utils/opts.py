@@ -15,4 +15,5 @@ class TrainConfig:
         self.train_batch_size = 32
         self.test_batch_size = 16
         self.epochs = 50
+        self.num_workers = 4
 
