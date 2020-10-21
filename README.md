@@ -164,3 +164,28 @@ CustomModel(
 
 
 
+Информация по скорости предсказания:
+|Model  | FPS |
+|---|---|
+|SqueezeNet|387.75|
+|**Our**|417.54|
+
+### Результаты 
+
+
+**Our model**  |  **Squeezenet**
+:-------------------------:|:-------------------------:
+![](results/portman_star_wars_our.jpg)  |  ![](results/portman_star_wars_squeezenet.jpg)
+![](results/kira_our.jpeg)  |  ![](results/kira_squeezenet.jpeg)
+
+**Our model** 
+
+![](results/kira_our.jpg)
+
+**И наконец то, зачем мы здесь все собрались. Сможет ли модель отличить актрис на изображение, где Кира Найтли играет Натали Портман**
+![](results/kira_star_wars_our.jpg)
+
+Мы видим, что точность не высокая, но модель все же склоняется к правильному ответу.
+
+AI не проведешь даже гримом !
+
